@@ -1,17 +1,16 @@
 #!/bin/bash
 
-
-echo Hello!
-
 function runtimeFunc()
 {
-	echo "In runtime function"
-	last | grep -E "^reboot" | cut -c23-39,58-72 > test.txt
+	last | grep -E "^reboot" | grep -v "still running" | cut -d" " -f7,15 > test.txt
 }
 
 function userFunc()
 {
-	echo "In User function"
+	last | cut -d" " -f1,2 | head -n -2 | sort -u > /tmp/user
+	while read LINE ; do (last | cut -d" " -f1,2 | head -n -2 | grep -c $LINE | tr -d "\n" && echo " $LINE") >> /tmp/user1; done < /tmp/user
+	cat /tmp/user1 | sort -n
+	rm /tmp/user /tmp/user1
 }
 
 function helpFunc()
@@ -24,22 +23,18 @@ function helpFunc()
 while [[ $# -gt 0 ]] ; do
 	case "$1" in
 		-r|--runtime)
-			echo "runtime"
 			runtimeFunc
 			shift
 			;;
 		-u|--user)
-			echo "user"
 			userFunc
 			shift
 			;;
 		-h|--help)
-			echo "help"
 			helpFunc
 			shift
 			;;
 		*)
-			echo "default"
 			helpFunc
 			shift
 			;;
