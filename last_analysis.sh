@@ -1,14 +1,14 @@
 #!/bin/bash
 
-#################################################################
-#																#
-#	last_analysis.sh											#
+#########################################################################
+#									#
+#	last_analysis.sh						#
 #	Beschreibung: Auflisten von Uptime- & Login-Informationen	#
-#																#
-#	Betriebssystem Labor Aufgabe 1								#
-#	Autoren: Fabian Schneider, Jeremia Haackmann				#
-#																#
-#################################################################
+#									#
+#	Betriebssystem Labor Aufgabe 1					#
+#	Autoren: Fabian Schneider, Jeremia Haackmann			#
+#									#
+#########################################################################
 
 
 function runtimeFunc()
