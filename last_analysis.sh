@@ -1,13 +1,13 @@
 #!/bin/bash
 
 #########################################################################
-#									#
-#	last_analysis.sh						#
-#	Beschreibung: Auflisten von Uptime- & Login-Informationen	#
-#									#
-#	Betriebssystem Labor Aufgabe 1					#
-#	Autoren: Fabian Schneider, Jeremia Haackmann			#
-#									#
+#																		#
+#	last_analysis.sh													#
+#	Beschreibung: Auflisten von Uptime- & Login-Informationen			#
+#																		#
+#	Betriebssystem Labor Aufgabe 1										#
+#	Autoren: Fabian Schneider, Jeremia Haackmann						#
+#																		#
 #########################################################################
 
 
@@ -15,7 +15,8 @@ function runtimeFunc()
 {
 	# Listet die Uptime seit dem letzten Reboot auf.
 	
-	last | grep -E "^reboot" | grep -v "still running" | cut -d" " -f7,15 > test.txt
+	last | grep -E "^reboot" | grep "still running" | tr -s ' ' | cut -d" " -f4,9,10
+	last | grep -E "^reboot" | grep -v "still running"| tr -s ' '  | cut -d" " -f4,11
 }
 
 function userFunc()
