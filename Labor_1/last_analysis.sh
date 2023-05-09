@@ -24,11 +24,11 @@ function userFunc()
 	# Zählt die Anzahl an Logins jedes einzelnen Users auf
 	
 	# Alle jemals angemeldeten User in einer temp. Datei speichern
-	last | cut -d" " -f1,2 | head -n -2 | sort -u > /tmp/user
+	last | cut -d" " -f1 | head -n -2 | sort -u > /tmp/user
 	
 	# Für jeden User aus der vorherigen Datei zählen, wie oft er sich am System angemeldet hat
 	while read LINE ; do 
-		(last | cut -d" " -f1,2 | head -n -2 | grep -c $LINE | tr -d "\n" && echo " $LINE") >> /tmp/user1; 
+		(last | cut -d" " -f1 | head -n -2 | grep -c $LINE | tr -d "\n" && echo " $LINE") >> /tmp/user1; 
 	done < /tmp/user
 	
 	# Ausgabe einer sortierten Liste 
