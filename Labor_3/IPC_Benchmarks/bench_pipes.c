@@ -1,5 +1,5 @@
 /*
- * Small benchmark for Pipes.
+ * Small benchmark for Linux-Pipes.
  *
  * Author: Fabian Schneider, Jeremia Haackmann
  */
@@ -25,8 +25,24 @@
 
 int main(int argc, char *argv[])
 {
-    const int sizes[] = {64, 256, 1024, 4096, 16384};
-    const int sizes_num = sizeof(sizes) / sizeof(sizes[0]);
+    // Set up test packages from 64 B to 16 MB
+
+    int min_package_size = 64; // 64 Bytes
+    int max_package_size = 16777216; // 16 MB
+    int sizes_num = 0;
+
+    for (int i = min_package_size; i <= max_package_size; i *= 4)
+    {
+        sizes_num++;
+        // printf("s: %d i: %d\n", num_packages, i);
+    }
+    int sizes[sizes_num];
+    int k = 1; 
+    for (int i = 0; i < sizes_num; i++){
+        sizes[i] = k*min_package_size;
+        k *= 4;
+        printf("Size[%d]: %d\n", i, sizes[i]);
+    }
 #define MAX_SIZE sizes[sizes_num - 1]
     pid_t pid = getpid();
     int pdes[2];
@@ -35,14 +51,13 @@ int main(int argc, char *argv[])
     char *buffer;
     FILE *fptr;
 
-    //  Anlegen einer neuen Pipe, in die gelesen und geschrieben wird.
+    //  Create new pipe for read and write action
 
     ret = pipe(pdes);
 
     if (ret != 0)
         ERROR("pipe()", errno);
 
-    // int ret = pid_child = fork();
     pid = getpid();
 
     ret = fork();
@@ -57,11 +72,10 @@ int main(int argc, char *argv[])
 
     if (0 == ret)
     {
-        /* CHILD Process: Reads from pipe*/
+        // Process 1: Reads from pipe
 
         int nread = 1;
         pid = getpid();
-        printf("PID %d (CHILD): COPY DONE\n", (int)pid);
         close(pdes[1]);
         while (nread != 0)
         {
@@ -72,7 +86,7 @@ int main(int argc, char *argv[])
     }
     else if (0 < ret)
     {
-        /* PARENT Process: Writes to pipe */
+        // Process 2: Writes to pipe
 
         int *ticks;
         close(pdes[0]);
@@ -109,6 +123,8 @@ int main(int argc, char *argv[])
             }
             gettimeofday(&tv_stop, NULL);
 
+
+
             min_ticks = INT_MAX;
             max_ticks = INT_MIN;
             ticks_all = 0;
@@ -127,10 +143,12 @@ int main(int argc, char *argv[])
 
             double bandwidth = ((double)current_size * MEASUREMENTS) / (1024.0 * 1024.0 * time_delta_sec); 
 
+            // Write measurements into file
             fptr = fopen("./messungen.txt", "a");
             fprintf(fptr, "%d; %.2f\n", current_size, bandwidth);
             fclose(fptr);
             
+            // Print measurements
             printf ("PID:%d time: min:%d max:%d Ticks Avg without min/max:%f Ticks (for %d measurements) for %d Bytes (%.2f MB/s)\n",
                 pid, min_ticks, max_ticks,
                 (double) ticks_all / (MEASUREMENTS-2.0), MEASUREMENTS, current_size,
