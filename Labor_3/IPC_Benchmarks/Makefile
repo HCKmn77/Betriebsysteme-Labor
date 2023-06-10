@@ -9,7 +9,7 @@
 #
 
 # Please add bench_pipes.c yourselve...
-SOURCES=bench_rdtsc.c bench_signal.c bench_mmap.c bench_pipes.c
+SOURCES=bench_rdtsc.c bench_signal.c bench_mmap.c bench_process_vm_readv.c bench_pipes.c
 ifeq ($(OS),Linux)
     SOURCES+=bench_process_vm_readv.c
 endif

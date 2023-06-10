@@ -23,8 +23,24 @@
 #include "bench_utils.h"
 
 int main(int argc, char * argv[]) {
-    const int sizes[] = {128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288};
-    const int sizes_num = sizeof(sizes)/sizeof(sizes[0]);
+    // Set up test packages from 64 B to 16 MB
+
+    int min_package_size = 64; // 64 Bytes
+    int max_package_size = 16777216; // 16 MB
+    int sizes_num = 0;
+
+    for (int i = min_package_size; i <= max_package_size; i *= 4)
+    {
+        sizes_num++;
+        // printf("s: %d i: %d\n", num_packages, i);
+    }
+    int sizes[sizes_num];
+    int k = 1; 
+    for (int i = 0; i < sizes_num; i++){
+        sizes[i] = k*min_package_size;
+        k *= 4;
+        printf("Size[%d]: %d\n", i, sizes[i]);
+    }
 #define MAX_SIZE sizes[sizes_num-1]
     int pipe_child_to_parent[2];
     int pipe_parent_to_child[2];
@@ -32,6 +48,8 @@ int main(int argc, char * argv[]) {
     pid_t pid;
     pid_t pid_child;
     int ret;
+    FILE *fptr;
+
 
     // Open pipe to communicate the pointer to buffer
     ret = pipe(pipe_child_to_parent);
@@ -156,12 +174,20 @@ int main(int argc, char * argv[]) {
 
         time_delta_sec = ((tv_stop.tv_sec - tv_start.tv_sec) + ((tv_stop.tv_usec - tv_start.tv_usec) / (1000.0 * 1000.0)));
 
-        printf("PID:%d time: min:%d max:%d Ticks Avg without min/max:%f Ticks (for %d measurements) for %d Bytes (%.2f MB/s)\n",
-               pid, min_ticks, max_ticks,
-               (double) ticks_all / (MEASUREMENTS - 2.0), MEASUREMENTS, nwrite,
-               ((double) current_size*MEASUREMENTS)/(1024.0*1024.0*time_delta_sec));
-    }
+        double bandwidth = ((double)current_size * MEASUREMENTS) / (1024.0 * 1024.0 * time_delta_sec); 
 
+        // Write measurements into file
+        fptr = fopen("./messungen_process_vm_readv.txt", "a");
+        fprintf(fptr, "%d; %.2f\n", current_size, bandwidth);
+        fclose(fptr);
+        
+        // Print measurements
+        printf ("PID:%d time: min:%d max:%d Ticks Avg without min/max:%f Ticks (for %d measurements) for %d Bytes (%.2f MB/s)\n",
+            pid, min_ticks, max_ticks,
+            (double) ticks_all / (MEASUREMENTS-2.0), MEASUREMENTS, current_size,
+            ((double) current_size * MEASUREMENTS)  / (1024.0*1024.0*time_delta_sec) );
+    }
+    
     // Tell Child to exit, too:
     write(pipe_parent_to_child[1], &pid, 1);
     return EXIT_SUCCESS;

@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
             double bandwidth = ((double)current_size * MEASUREMENTS) / (1024.0 * 1024.0 * time_delta_sec); 
 
             // Write measurements into file
-            fptr = fopen("./messungen.txt", "a");
+            fptr = fopen("./messungen_pipes.txt", "a");
             fprintf(fptr, "%d; %.2f\n", current_size, bandwidth);
             fclose(fptr);
             
@@ -152,7 +152,8 @@ int main(int argc, char *argv[])
             printf ("PID:%d time: min:%d max:%d Ticks Avg without min/max:%f Ticks (for %d measurements) for %d Bytes (%.2f MB/s)\n",
                 pid, min_ticks, max_ticks,
                 (double) ticks_all / (MEASUREMENTS-2.0), MEASUREMENTS, current_size,
-                ((double) current_size * MEASUREMENTS)  / (1024.0*1024.0*time_delta_sec) );        }
+                ((double) current_size * MEASUREMENTS)  / (1024.0*1024.0*time_delta_sec) );
+        }
     }
     return (EXIT_SUCCESS);
 }
